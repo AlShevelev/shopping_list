@@ -29,6 +29,7 @@ class _TodoListState extends State<TodoList> {
   }
  
   TextEditingController inputController = new TextEditingController();
+  
   void _addItem(BuildContext context) async {
     String item = inputController.text;
     if (item.length > 0) {
@@ -103,82 +104,23 @@ class _TodoListState extends State<TodoList> {
         text: AppLocalizations.of(context).menuClearAutocompleteSuggestionsQuery
     );
   }
-
-  // Build the whole list of todo items
-  Widget _buildTodoList() {
-    return new ListView.builder(
-      itemCount: _items.length + _completedItems.length,
-      itemBuilder: (context, index) {
-        if (index < _items.length) {
-          return _buildListItem(index, _items[index].text);
-        } else {
-          int completedIndex = index - _items.length;
-          return _buildCompletedListItem(
-              completedIndex, _completedItems[completedIndex].text);
-        }
-      },
-    );
-  }
-  
-  // Build a single todo item
-  Widget _buildListItem(int itemIndex, String todoText) {
-    return new CheckboxListTile(
-        value: false,
-        controlAffinity: ListTileControlAffinity.leading,
-        title: new Text(todoText),
-        onChanged: (newValue) => _completeItem(itemIndex)
-    );
-  }
-  
-  // Build a single completed todo item
-  Widget _buildCompletedListItem(int itemIndex, String todoText) {
-    return new CheckboxListTile(
-      value: true,
-      controlAffinity: ListTileControlAffinity.leading,
-      title: new Text(
-        todoText,
-        style: TextStyle(color: Colors.grey, decoration: TextDecoration.lineThrough)
-      ),
-      onChanged: (newValue) => _uncompleteItem(itemIndex),
-    );
-  }
-  
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
           title: Text(AppLocalizations.of(context).homePageTitle),
           actions: <Widget>[
-            PopupMenuButton<MenuActions>(
-              onSelected: (MenuActions action) {
-                switch (action) {
-                  case MenuActions.CLEAR_SUGGESTIONS: _clearSuggestions(context); break;
-                  case MenuActions.CLEAR_COMPLETED: _clearCompleted(context); break;
-                  case MenuActions.CLEAR_ALL: _clearAll(context); break;
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  PopupMenuItem<MenuActions>(
-                    child: Text(AppLocalizations.of(context).menuClearAutocompleteSuggestions),
-                    value: MenuActions.CLEAR_SUGGESTIONS,
-                  ),
-                  PopupMenuItem<MenuActions>(
-                    child: Text(AppLocalizations.of(context).menuClearCompleted),
-                    value: MenuActions.CLEAR_COMPLETED,
-                  ),
-                  PopupMenuItem<MenuActions>(
-                    child: Text(AppLocalizations.of(context).menuClearAll),
-                    value: MenuActions.CLEAR_ALL,
-                  ),
-                ];
-              },
+            PopupMenu(
+              clearSuggestions: _clearSuggestions,
+              clearCompleted: _clearCompleted,
+              clearAll: _clearAll,
             )
           ]),
       body: Stack(
         children: <Widget>[
           Container(
-            child: _buildTodoList(),
+            child: ShoppingList(_items, _completedItems, _completeItem, _uncompleteItem),
             padding: EdgeInsets.only(bottom: 60),
           ),
           Positioned(
@@ -188,63 +130,11 @@ class _TodoListState extends State<TodoList> {
                   decoration: BoxDecoration(
                     color: Colors.white,                                  // Input field
                   ),
-                  child: TypeAheadField(                                // Suggestions list
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: inputController,
-                      textCapitalization: TextCapitalization.sentences,
-                      onSubmitted: (dynamic x) => _addItem(context),
-                      autofocus: true,
-                      focusNode: _keyboardFocusNode,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context).newItemHint,
-                        contentPadding: EdgeInsets.all(20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.zero,
-                          borderSide: BorderSide(
-                            width: 1,
-                            color: Colors.black26,
-                          )
-                        )
-                      ),
-                    ),
-                    suggestionsBoxVerticalOffset: 0,
-                    direction: AxisDirection.up,
-                    hideOnEmpty: true,
-                    suggestionsCallback: (pattern) {
-                      if (pattern.length > 0) {
-                        return _suggestions.get(pattern).map((v) => v.text).toList();
-                      } else {
-                        return [];
-                      }
-                    },
-                    debounceDuration: Duration(milliseconds: 100),
-                    itemBuilder: (context, suggestion) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: <BoxShadow>[
-                            BoxShadow(
-                              color: Colors.black26,
-                            )
-                          ]
-                        ),
-                        child: ListTile(
-                          title: Text(
-                            suggestion
-                          ),
-                        ),
-                      );
-                    },
-                    transitionBuilder:
-                        (context, suggestionsBox, animationController) =>
-                    suggestionsBox, // no animation
-                    onSuggestionSelected: (suggestion) {
-                      inputController.text = suggestion;
-                      _addItem(context);
-                      if (!_keyboardFocusNode.hasFocus) {
-                        FocusScope.of(context).requestFocus(_keyboardFocusNode);
-                      }
-                    },
+                  child: InputField(
+                    inputController: inputController,
+                    keyboardFocusNode: _keyboardFocusNode,
+                    addItem: _addItem,
+                    suggestions: _suggestions,
                   ))),
         ],
       ),

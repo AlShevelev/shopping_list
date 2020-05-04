@@ -12,6 +12,11 @@ import 'package:shoppinglist/model/data_storage/DataStorage.dart';
 import 'package:shoppinglist/shared/helpers/AlertDialogs.dart';
 
 part 'TodoList.dart';
+part 'ListItem.dart';
+part 'CompletedListItem.dart';
+part 'ShoppingList.dart';
+part 'PopupMenu.dart';
+part 'InputField.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
