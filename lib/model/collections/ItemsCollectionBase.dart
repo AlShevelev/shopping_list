@@ -17,7 +17,7 @@ abstract class ItemsCollectionBase<T extends CollectionItem> implements ItemsCol
 
   @override
   Future<void> add(T item) async {
-    if (!items.contains(item)) {
+    if(!items.any((v) => v.text == item.text)) {
       items.add(item);
       await _save(getStorageKey());
     }
