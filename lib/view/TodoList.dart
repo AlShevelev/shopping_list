@@ -3,12 +3,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shoppinglist/dto/MenuActions.dart';
-import 'package:shoppinglist/helpers/AlertDialogs.dart';
-import 'package:shoppinglist/localization/AppLocalizations.dart';
+import 'package:shoppinglist/dto/ShoppingItem.dart';
+import 'package:shoppinglist/dto/SuggestionItem.dart';
+import 'package:shoppinglist/model/collections/ItemsCollection.dart';
+import 'package:shoppinglist/model/collections/ShoppingCompletedItemsCollection.dart';
+import 'package:shoppinglist/model/collections/ShoppingItemsCollection.dart';
+import 'package:shoppinglist/model/data_storage/SharedPreferencesDataStorage.dart';
+import 'package:shoppinglist/shared/helpers/AlertDialogs.dart';
+import 'package:shoppinglist/shared/localization/AppLocalizations.dart';
 
-import '../suggestions.dart';
+import '../model/collections/SuggestionsCollection.dart';
 
 class TodoList extends StatefulWidget {
   TodoList({Key key}) : super(key: key);
@@ -18,11 +23,12 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
-  List<String> _items = [];
-  List<String> _completedItems = [];
   
-  Suggestions _suggestions = Suggestions();
+  SuggestionsCollection _suggestions = SuggestionsCollection(SharedPreferencesDataStorage());
   FocusNode _keyboardFocusNode = FocusNode();
+  
+  ItemsCollection _items;
+  ItemsCollection _completedItems;
   
   @override
   void initState() {
@@ -31,31 +37,22 @@ class _TodoListState extends State<TodoList> {
   }
   
   void _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _items = prefs.getStringList("items") ?? [];
-      _completedItems = prefs.getStringList("completedItems") ?? [];
+      _items = ShoppingItemsCollection(SharedPreferencesDataStorage());
+      _completedItems = ShoppingCompletedItemsCollection(SharedPreferencesDataStorage());
     });
   }
-  
-  void _saveData() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("items", _items);
-    prefs.setStringList("completedItems", _completedItems);
-  }
-  
+ 
   TextEditingController inputController = new TextEditingController();
-  void _addItem(BuildContext context) {
+  void _addItem(BuildContext context) async {
     String item = inputController.text;
     if (item.length > 0) {
+      await _items.add(ShoppingItem(item));
+      await _suggestions.add(SuggestionItem(item));
+      
       setState(() {
-        _items.add(item);
-        _suggestions.add(item);
-        
-        // Reset input
-        inputController.text = "";
+        inputController.text = "";    // Reset input
       });
-      _saveData();
     } else {
       Fluttertoast.showToast(
         msg: AppLocalizations.of(context).fabButtonHint,
@@ -63,18 +60,14 @@ class _TodoListState extends State<TodoList> {
     }
   }
   
-  void _completeItem(int index) {
-    setState(() {
-      _completedItems.insert(0, _items.removeAt(index));
-    });
-    _saveData();
+  void _completeItem(int index) async {
+    await _completedItems.addToStart(await _items.removeAt(index));
+    setState(() { });
   }
   
-  void _uncompleteItem(int index) {
-    setState(() {
-      _items.add(_completedItems.removeAt(index));
-    });
-    _saveData();
+  void _uncompleteItem(int index) async {
+    await _items.add(await _completedItems.removeAt(index));
+    setState(() { });
   }
   
   void _clearCompleted(BuildContext context) {
@@ -91,11 +84,11 @@ class _TodoListState extends State<TodoList> {
     }
   }
   
-  void _processClearCompleted() {
-    setState(() {
-      _completedItems.clear();
-    });
-    _saveData();
+  void _processClearCompleted() async {
+    if(_completedItems.isNotEmpty) {
+      await _completedItems.clear();
+      setState(() { });
+    }
   }
 
   void _clearAll(BuildContext context) {
@@ -106,31 +99,22 @@ class _TodoListState extends State<TodoList> {
     );
   }
   
-  void _processClearAll() {
-    bool cleared = false;
+  void _processClearAll() async {
     if (_completedItems.isNotEmpty) {
-      setState(() {
-        _completedItems.clear();
-      });
-      cleared = true;
+      await _completedItems.clear();
+      setState(() { });
     }
   
     if(_items.isNotEmpty) {
-      setState(() {
-        _items.clear();
-      });
-      cleared = true;
-    }
-  
-    if(cleared) {
-      _saveData();
+      await _items.clear();
+      setState(() { });
     }
   }
 
   void _clearSuggestions(BuildContext context) {
     showConfirmationDialog(
         context: context,
-        acceptAction: () => _suggestions.clear(),
+        acceptAction: (() async { await _suggestions.clear(); }),
         text: AppLocalizations.of(context).menuClearAutocompleteSuggestionsQuery
     );
   }
@@ -141,11 +125,11 @@ class _TodoListState extends State<TodoList> {
       itemCount: _items.length + _completedItems.length,
       itemBuilder: (context, index) {
         if (index < _items.length) {
-          return _buildListItem(index, _items[index]);
+          return _buildListItem(index, _items[index].text);
         } else {
           int completedIndex = index - _items.length;
           return _buildCompletedListItem(
-              completedIndex, _completedItems[completedIndex]);
+              completedIndex, _completedItems[completedIndex].text);
         }
       },
     );
@@ -153,19 +137,24 @@ class _TodoListState extends State<TodoList> {
   
   // Build a single todo item
   Widget _buildListItem(int itemIndex, String todoText) {
-    return new ListTile(
-        title: new Text(todoText), onTap: () => _completeItem(itemIndex));
+    return new CheckboxListTile(
+        value: false,
+        controlAffinity: ListTileControlAffinity.leading,
+        title: new Text(todoText),
+        onChanged: (newValue) => _completeItem(itemIndex)
+    );
   }
   
   // Build a single completed todo item
   Widget _buildCompletedListItem(int itemIndex, String todoText) {
-    return new ListTile(
+    return new CheckboxListTile(
+      value: true,
+      controlAffinity: ListTileControlAffinity.leading,
       title: new Text(
         todoText,
-        style: TextStyle(
-            color: Colors.grey, decoration: TextDecoration.lineThrough),
+        style: TextStyle(color: Colors.grey, decoration: TextDecoration.lineThrough)
       ),
-      onTap: () => _uncompleteItem(itemIndex),
+      onChanged: (newValue) => _uncompleteItem(itemIndex),
     );
   }
   
@@ -238,7 +227,7 @@ class _TodoListState extends State<TodoList> {
                     hideOnEmpty: true,
                     suggestionsCallback: (pattern) {
                       if (pattern.length > 0) {
-                        return _suggestions.get(pattern);
+                        return _suggestions.get(pattern).map((v) => v.text).toList();
                       } else {
                         return [];
                       }

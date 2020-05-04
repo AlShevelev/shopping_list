@@ -2,10 +2,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shoppinglist/localization/AppLocalizations.dart';
-import 'package:shoppinglist/localization/AppLocalizationsDelegate.dart';
+import 'package:shoppinglist/shared/localization/AppLocalizations.dart';
+import 'package:shoppinglist/shared/localization/AppLocalizationsDelegate.dart';
 
-import '../main.dart';
 import 'TodoList.dart';
 
 class MyApp extends StatelessWidget {

@@ -1,7 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shoppinglist/localization/AppLocalizations.dart';
+import 'package:shoppinglist/shared/localization/AppLocalizations.dart';
 
 void showConfirmationDialog({BuildContext context, Function acceptAction, String title, String text}) {
   showDialog(
