@@ -1,4 +1,10 @@
+library localization;
+
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+
+part 'AppLocalizationsDelegate.dart';
 
 class AppLocalizations {
     AppLocalizations(this.locale);

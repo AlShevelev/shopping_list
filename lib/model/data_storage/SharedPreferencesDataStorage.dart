@@ -1,5 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shoppinglist/model/data_storage/DataStorage.dart';
+part of data_storage;
 
 class SharedPreferencesDataStorage implements DataStorage {
   @override

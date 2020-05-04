@@ -1,5 +1,13 @@
+library collection_items;
+
 import 'package:shoppinglist/dto/CollectionItem.dart';
-import 'package:shoppinglist/dto/ShoppingItem.dart';
+import 'package:shoppinglist/model/data_storage/DataStorage.dart';
+import '../data_storage/DataStorage.dart';
+
+part 'ItemsCollectionBase.dart';
+part 'ShoppingCompletedItemsCollection.dart';
+part 'ShoppingItemsCollection.dart';
+part 'SuggestionsCollection.dart';
 
 abstract class ItemsCollection<T extends CollectionItem> {
   int get length;

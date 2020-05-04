@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
-import 'AppLocalizations.dart';
+part of localization;
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
     const AppLocalizationsDelegate();

@@ -1,19 +1,4 @@
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shoppinglist/dto/MenuActions.dart';
-import 'package:shoppinglist/dto/ShoppingItem.dart';
-import 'package:shoppinglist/dto/SuggestionItem.dart';
-import 'package:shoppinglist/model/collections/ItemsCollection.dart';
-import 'package:shoppinglist/model/collections/ShoppingCompletedItemsCollection.dart';
-import 'package:shoppinglist/model/collections/ShoppingItemsCollection.dart';
-import 'package:shoppinglist/model/data_storage/SharedPreferencesDataStorage.dart';
-import 'package:shoppinglist/shared/helpers/AlertDialogs.dart';
-import 'package:shoppinglist/shared/localization/AppLocalizations.dart';
-
-import '../model/collections/SuggestionsCollection.dart';
+part of view;
 
 class TodoList extends StatefulWidget {
   TodoList({Key key}) : super(key: key);

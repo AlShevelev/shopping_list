@@ -1,11 +1,17 @@
+library view;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shoppinglist/shared/localization/AppLocalizations.dart';
-import 'package:shoppinglist/shared/localization/AppLocalizationsDelegate.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shoppinglist/dto/CollectionItem.dart';
+import 'package:shoppinglist/model/collections/ItemsCollection.dart';
+import 'package:shoppinglist/model/data_storage/DataStorage.dart';
+import 'package:shoppinglist/shared/helpers/AlertDialogs.dart';
 
-import 'TodoList.dart';
+part 'TodoList.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

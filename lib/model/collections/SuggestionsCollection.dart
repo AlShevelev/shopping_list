@@ -1,7 +1,4 @@
-import 'package:shoppinglist/dto/SuggestionItem.dart';
-import 'package:shoppinglist/model/data_storage/DataStorage.dart';
-
-import 'ItemsCollectionBase.dart';
+part of collection_items;
 
 class SuggestionsCollection extends ItemsCollectionBase<SuggestionItem> {
   static const _STORAGE_KEY = "SUGGESTIONS";

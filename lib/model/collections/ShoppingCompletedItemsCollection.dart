@@ -1,8 +1,4 @@
-
-import 'package:shoppinglist/dto/ShoppingItem.dart';
-import 'package:shoppinglist/model/data_storage/DataStorage.dart';
-
-import 'ItemsCollectionBase.dart';
+part of collection_items;
 
 class ShoppingCompletedItemsCollection extends ItemsCollectionBase<ShoppingItem> {
   static const _STORAGE_KEY = "SHOPPING_ITEMS_COMPLETED";

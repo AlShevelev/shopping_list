@@ -1,4 +1,4 @@
-import 'CollectionItem.dart';
+part of dto;
 
 class SuggestionItem  implements CollectionItem {
   final String text;

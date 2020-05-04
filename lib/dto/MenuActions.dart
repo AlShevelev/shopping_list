@@ -1,4 +1,5 @@
-// Possible Actions in PopUpMenu
+part of dto;
+
 enum MenuActions {
   CLEAR_SUGGESTIONS,
   CLEAR_COMPLETED,

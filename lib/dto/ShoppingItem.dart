@@ -1,4 +1,4 @@
-import 'package:shoppinglist/dto/CollectionItem.dart';
+part of dto;
 
 class ShoppingItem implements CollectionItem {
   final String text;

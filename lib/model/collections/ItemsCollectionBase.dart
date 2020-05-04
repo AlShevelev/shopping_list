@@ -1,7 +1,4 @@
-import 'package:shoppinglist/dto/CollectionItem.dart';
-
-import '../data_storage/DataStorage.dart';
-import 'ItemsCollection.dart';
+part of collection_items;
 
 abstract class ItemsCollectionBase<T extends CollectionItem> implements ItemsCollection<T> {
   final DataStorage _dataStorage;
